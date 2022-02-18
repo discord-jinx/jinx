@@ -1,3 +1,3 @@
 // Application
-export * from "./slash/Application";
-export * from "./slash/ApplicationHandler";
+export * from "./application/Application";
+export * from "./application/ApplicationHandler";
