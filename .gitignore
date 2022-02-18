@@ -1,0 +1,4 @@
+/node_modules
+/dist
+/commands
+/test.js
