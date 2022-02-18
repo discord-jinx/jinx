@@ -4,7 +4,7 @@ import {
     UserContextMenuInteraction 
 } from "discord.js";
 import { Application } from "..";
-import { JinxClient, JinxHandler } from "../..";
+import { JinxClient, JinxHandler, JinxHandlerOptions } from "../..";
 
 export class ApplicationHandler extends JinxHandler {
     public client!: JinxClient;
@@ -148,12 +148,10 @@ export class ApplicationHandler extends JinxHandler {
     };
 };
 
-export interface ApplicationHandlerOptions {
+export interface ApplicationHandlerOptions extends JinxHandlerOptions {
     allowDM?: boolean;
     global?: boolean;
     guilds?: "all" | string[];
     blacklist?: string[];
-    instance?: Function;
     run?: boolean | ((interaction: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction) => boolean);
-    directory: string;
 };
