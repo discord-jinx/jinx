@@ -11,7 +11,7 @@ import {
 import { ApplicationHandler } from "..";
 import { JinxClient } from "../..";
 
-const resolveTypes = {
+const appTypes = {
     "CHAT_INPUT": "chat",
     "MESSAGE": "message",
     "USER": "user"
@@ -26,10 +26,22 @@ export class Application {
     public defaultPermission?: boolean;
     public handler!: ApplicationHandler;
     public client!: JinxClient;
+    public allowDM?: boolean;
+    public dmOnly?: boolean;
+    public onlyChannel?: string | string[];
+    public onlyUser?: string | string[];
+    public id?: string;
 
-    constructor(data = {} as ApplicationCommandDataResolvable) {
-        
-        const { type = "CHAT_INPUT", name = null } = data;
+    constructor(data = {} as ApplicationCommandDataResolvable & ApplicationOptions) {
+
+        const {
+            type = "CHAT_INPUT",
+            name = null,
+            allowDM,
+            dmOnly = false,
+            onlyChannel = null,
+            onlyUser = null
+        } = data;
 
         /**
          * The type of the command
@@ -44,10 +56,16 @@ export class Application {
          */
         this.name = name as string;
 
+        /**
+         * The id of the command
+         * @type {string | null}
+         */
+        this.id = "";
+
 
         if (type === "CHAT_INPUT") {
             const { options = [], description = "This command has no description", defaultPermission = true } = data as ChatInputApplicationCommandData;
-            
+
             /**
              * The description of the command
              * @type {string}
@@ -66,9 +84,8 @@ export class Application {
              */
             this.defaultPermission = Boolean(defaultPermission);
             this.default_permission = Boolean(defaultPermission);
-            
-            this.handler.cache.set(`${resolveTypes[type]}-${this.name}`, this);
 
+            this.id = appTypes[type] + "-" + this.name;
         } else if (type === "MESSAGE" || type === "USER") {
             const { defaultPermission = true } = data as UserApplicationCommandData | MessageApplicationCommandData;
 
@@ -79,8 +96,34 @@ export class Application {
             this.defaultPermission = Boolean(defaultPermission);
             this.default_permission = Boolean(defaultPermission);
 
-            this.handler.cache.set(`${resolveTypes[type]}-${this.name}`, this);
+            this.id = appTypes[type] + "-" + this.name;
         };
+
+        /**
+         * Defines the property - "allowDM"
+         * @type {boolean}
+         */
+        Object.defineProperty(this, "allowDM", { value: (allowDM && typeof (allowDM) === "boolean") ? allowDM : (this.handler) ? this.handler.allowDM : false, enumerable: false });
+
+        /**
+         * Defines the property - "dmOnly"
+         * @type {boolean}
+         */
+        Object.defineProperty(this, "dmOnly", { value: Boolean(dmOnly), enumerable: false });
+
+        /**
+         * Defines the property - "onlyChannel"
+         * @type {string | string[] | null}
+         */
+        Object.defineProperty(this, "onlyChannel", { value: onlyChannel, enumerable: false });
+
+        /**
+         * Defines the property - "onlyUser"
+         * @type {string | string[] | null}
+         */
+        Object.defineProperty(this, "onlyUser", { value: onlyUser, enumerable: false });
+
+        this.handler.cache.set(`${appTypes[type]}-${this.name}`, this);
     };
 
     /**
@@ -89,7 +132,7 @@ export class Application {
      * @param {MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction} interaction - The discord.js interaction object
      * @returns {boolean}
      */
-    runBefore (interaction: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction): boolean {
+    public runBefore(interaction: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction): boolean {
         return true;
     };
 
@@ -98,7 +141,28 @@ export class Application {
      * @param {MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction} interaction - The discord.js interaction object
      * @returns 
      */
-    interact (interaction: CommandInteraction) {
+    public interact(interaction: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction) {
         return;
     };
+
+    /**
+     * Removes the command from the cache
+     */
+    public remove() {
+        return this.handler.remove(this.id as string);
+    };
+
+    /**
+     * Reloads the command
+     */
+    public reload () {
+        return this.handler.reload(this.id as string);
+    };
+};
+
+export interface ApplicationOptions {
+    allowDM?: boolean;
+    dmOnly?: boolean;
+    onlyChannel?: string | string[];
+    onlyUser?: string | string[];
 };
