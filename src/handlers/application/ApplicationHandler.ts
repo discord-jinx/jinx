@@ -9,11 +9,15 @@ import { JinxClient, JinxHandler } from "../..";
 export class ApplicationHandler extends JinxHandler {
     public client!: JinxClient;
     public allowDM: boolean;
+    public global: boolean;
+    public guilds: string | string[];
 
     constructor (client: JinxClient, {
         directory,
         instance = Application,
-        allowDM = false
+        allowDM = false,
+        global = true,
+        guilds = "all"
     } = {} as ApplicationHandlerOptions) {
         super(client, {
             directory,
@@ -21,10 +25,23 @@ export class ApplicationHandler extends JinxHandler {
         });
 
         /**
-         * Whether to allow commands on DM or not
+         * Whether to allow commands on DM
          * @type {boolean}
          */
         this.allowDM = Boolean(allowDM);
+
+        /**
+         * Whether to register the commands globally
+         * @type {boolean}
+         */
+        this.global = Boolean(global);
+
+        /**
+         * The guilds to register the commands.
+         * @type {"all" | string[]}
+         * default to "all"
+         */
+        this.guilds = guilds;
 
         this.setup();
     };
@@ -53,20 +70,39 @@ export class ApplicationHandler extends JinxHandler {
                  commands.push(app);
              });
 
-             this.client.guilds.cache.get("942782748899307580")?.commands.set(commands);
+             if (this.global) {
+                 this.client.application?.commands.set(commands);
+             };
+
+             if (typeof (this.guilds) === "string" && this.guilds === "all") {
+                this.client.guilds.cache.forEach(async guild => {
+                    await guild.commands.set(commands).catch(() => {});
+                });
+             } else if (Array.isArray(this.guilds)) {
+                this.guilds.forEach(async id => {
+                    const guild = this.client.guilds.cache.get(id);
+
+                    if (guild) await guild.commands.set(commands).catch(() => {});
+                });
+             };
         });
     };
 
     private async exec (i: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction, type: "chat" | "message" | "user") {
-        if (this.allowDM !== true && i.channel?.type === "DM") return;
+        const command = this.cache.get(`${type}-${i.commandName}`) as Application;
 
-        const command = this.cache.get(`${type}-${i.commandName}`);
-
-        if (!(await command.runBefore(i))) {
-            return;
-        };
-
-        return command ? command.interact(i) : null;
+        if (command) {
+            if (!(await command.runBefore(i))) {
+                return;
+            };
+            
+            if (!command.allowDM && !i.inGuild()) return;
+    
+            if (command.onlyChannel && !this.client.util.checkChannel(command.onlyChannel, i.channelId)) return;
+            if (command.onlyUser && !this.client.util.hasUser(command.onlyUser, i.user.id)) return;
+    
+            command ? command.interact(i) : null;
+        } else return;
     };
 };
 
