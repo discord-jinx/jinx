@@ -42,25 +42,11 @@ export class JinxHandler {
 
     };
 
-    public load (f: string) {
-        let file = require(path.resolve(f));
-
-        if (!this.client.util.checkClass(file)) {
-            if (this.client.util.checkClass(file.default)) {
-                file = file.default;
-            } else return null;
-        };
-
-        file.prototype.client = this.client;
-        file.prototype.handler = this;
-
-        const c = new file();
-
-        if (this.instance) {
-            if (!(c instanceof this.instance)) return;
-        };
+    public load (filepath: string) {
+        return this.client.util.getModule(filepath, this);
     };
 
+    
     public loadAll (directory: string = this.directory) {
         const paths = this.client.util.readdirFiles(directory);
         console.log(paths)
@@ -69,7 +55,61 @@ export class JinxHandler {
             const file = path.resolve(paths[i]);
 
             this.load(file);
-        }
+        };
+    };
+
+    /**
+     * Reload a module from the cache
+     * @param {string} id
+     */
+    public reload (id: string): boolean {
+        const file = this.cache.get(id);
+
+        if (!file) {
+            return false;
+        };
+
+        const fpath = file.path;
+        delete require.cache[require.resolve(fpath)];
+        this.load(fpath);
+
+        return true;
+    };
+
+    /**
+     * Reload all the modules from the cache
+     * @returns {undefined} undefined
+     */
+    public reloadAll () {
+        return this.cache.forEach((file) => {
+            return this.reload(file.id);
+        });
+    };
+
+    /**
+     * Remove a module from the cache
+     * @param {string} id - The id of the module 
+     * @returns {boolean} boolean
+     */
+    public remove (id: string): boolean {
+        return this.cache.delete(id);
+    };
+
+    /**
+     * Remove all the modules from the cache
+     * @param {boolean} confirm - Pass true to confirm
+     */
+    public removeAll (confirm: boolean): boolean {
+        const keys: string[] = [];
+        this.cache.forEach((_, k) => keys.push(k));
+
+        if (!confirm) return false;
+        
+         for (let key of keys) {
+             this.cache.delete(key);
+         };
+
+        return true;
     };
 };
 
