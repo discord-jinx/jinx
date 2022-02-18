@@ -1,4 +1,4 @@
-import { UserResolvable } from "discord.js";
+import { Collection, UserResolvable } from "discord.js";
 import glob, { sync } from "glob";
 import path from "path";
 import { JinxClient } from "..";
@@ -64,5 +64,12 @@ export class Util {
         };
 
         return file;
+    };
+
+    public getAllCollectionKeys (col: Collection<any, any>): string[] {
+        const cache: string[] = [];
+        col.forEach((v, k) => cache.push(k));
+
+        return cache;
     };
 };
