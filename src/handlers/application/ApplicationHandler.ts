@@ -11,13 +11,17 @@ export class ApplicationHandler extends JinxHandler {
     public allowDM: boolean;
     public global: boolean;
     public guilds: string | string[];
+    public blacklist: string | string[];
+    public run: boolean | Function;
 
     constructor (client: JinxClient, {
         directory,
         instance = Application,
         allowDM = false,
         global = true,
-        guilds = "all"
+        guilds = "all",
+        blacklist = [],
+        run = true
     } = {} as ApplicationHandlerOptions) {
         super(client, {
             directory,
@@ -42,13 +46,52 @@ export class ApplicationHandler extends JinxHandler {
          * default to "all"
          */
         this.guilds = guilds;
+        
+        /**
+         * The ids of the users that can't use the commands
+         * @type {string[]}
+         */
+        this.blacklist = Array.isArray(blacklist) ? blacklist : [];
 
+        /**
+         * The function to run before the command
+         * Good for checking and blocking the command
+         * @type {boolean | Function}
+         */
+        this.run = typeof (run) === "function" ? run.bind(this) : run;
+
+        /**
+         * Setup the commands
+         */
         this.setup();
+    };
+
+    /**
+     * Add a user id or push an array of users to the blacklist
+     * @param {string | string[]} id - The id or array of ids
+     * @param {boolean} push - Whether to push to the current array
+     */
+    public setBlacklist (id: string | string[], push?: boolean) {
+        if (Array.isArray(id)) {
+            if (push) {
+                return id.forEach((i) => (this.blacklist as string[]).push(i));
+            } else {
+                this.blacklist = id;
+
+                return this;
+            };
+        } else if (id) {
+            return (this.blacklist as string[]).push(String(id));
+        };
     };
 
     private setup (): void {
         this.client.once("ready", () => {
             this.client.on("interactionCreate", (i) => {
+
+                if (this.blacklist.includes(i.user.id)) {
+                    return;
+                };
 
                 if (i.isCommand()) {
                     return this.exec(i, "chat");
@@ -92,10 +135,9 @@ export class ApplicationHandler extends JinxHandler {
         const command = this.cache.get(`${type}-${i.commandName}`) as Application;
 
         if (command) {
-            if (!(await command.runBefore(i))) {
-                return;
-            };
             
+            if (typeof (this.run) === "function" && !(await this.run(i)) || !this.run) return;
+            if (!(await command.runBefore(i))) return;
             if (!command.allowDM && !i.inGuild()) return;
     
             if (command.onlyChannel && !this.client.util.checkChannel(command.onlyChannel, i.channelId)) return;
@@ -110,6 +152,8 @@ export interface ApplicationHandlerOptions {
     allowDM?: boolean;
     global?: boolean;
     guilds?: "all" | string[];
-    directory: string;
+    blacklist?: string[];
     instance?: Function;
+    run?: boolean | ((interaction: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction) => boolean);
+    directory: string;
 };
