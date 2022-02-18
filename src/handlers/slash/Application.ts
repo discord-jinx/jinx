@@ -9,6 +9,7 @@ import {
     UserContextMenuInteraction
 } from "discord.js";
 import { ApplicationHandler } from "..";
+import { JinxClient } from "../..";
 
 const resolveTypes = {
     "CHAT_INPUT": "chat",
@@ -24,6 +25,7 @@ export class Application {
     public default_permission?: boolean;
     public defaultPermission?: boolean;
     public handler!: ApplicationHandler;
+    public client!: JinxClient;
 
     constructor(data = {} as ApplicationCommandDataResolvable) {
         
