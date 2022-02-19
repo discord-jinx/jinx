@@ -3,13 +3,20 @@
   "version": "1.0.0",
   "description": "A discord.js framework for bot development.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Neven",
   "scripts": {
     "build": "tsc",
     "test": "nodemon test.js"
   },
-  "repository": "https://github.com/nevenxr/discord-jinx.git",
-  "author": "Neven",
-  "license": "MIT",
+  "keywords": [
+    "discord",
+    "discord.js",
+    "discord-jinx",
+    "framework",
+    "client",
+    "bot"
+  ],
   "devDependencies": {
     "@types/glob": "^7.2.0",
     "@types/node": "^17.0.18",
@@ -17,7 +24,15 @@
   },
   "dependencies": {
     "dbotlinkgen": "^1.2.0",
-    "discord.js": "^13.6.0",
     "glob": "^7.2.0"
-  }
+  },
+  "homepage": "https://github.com/nevenxr/discord-jinx#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nevenxr/discord-jinx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nevenxr/discord-jinx/issues"
+  },
+  "license": "MIT"
 }
