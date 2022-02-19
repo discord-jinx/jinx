@@ -1,6 +1,12 @@
 import { JinxClient, JinxHandler, JinxHandlerOptions } from "../..";
 import { Event } from "..";
 
+/**
+ * Handles and loads the events
+ * @param {JinxClient} client - The Jinx client
+ * @param {JinxHandlerOptions} options - The options for the handler
+ * @extends {JinxHandler}
+ */
 export class EventHandler extends JinxHandler {
     constructor(client: JinxClient, {
         directory,
