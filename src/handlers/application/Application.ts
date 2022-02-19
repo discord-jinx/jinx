@@ -17,6 +17,10 @@ const appTypes = {
     "USER": "user"
 };
 
+/**
+ * Represents a application command
+ * @param {ApplicationCommandDataResolvable & ApplicationOptions} data - The options for the command
+ */
 export class Application {
     public type?: string;
     public name?: string;

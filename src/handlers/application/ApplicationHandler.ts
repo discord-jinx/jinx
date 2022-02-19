@@ -6,6 +6,12 @@ import {
 import { Application } from "..";
 import { JinxClient, JinxHandler, JinxHandlerOptions } from "../..";
 
+/**
+ * Handles and loads the commands
+ * @param {JinxClient} client - The Jinx client
+ * @param {ApplicationHandlerOptions} options - The options for the handler
+ * @extends {JinxHandler}
+ */
 export class ApplicationHandler extends JinxHandler {
     public client!: JinxClient;
     public allowDM: boolean;
