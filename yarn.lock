@@ -91,6 +91,11 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
 
+dbotlinkgen@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/dbotlinkgen/-/dbotlinkgen-1.2.0.tgz#22469ecd7dc64e6aa5cf201d36e925bf471253c0"
+  integrity sha512-8LmK9/Km48A868s/2HCC8jcb0A6RrP5F7dKZ7VfhD5mJjzRiAKDrT1nU9npW/ctYmpw3kqmmO+AKwVVBbUtTBg==
+
 delayed-stream@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delayed-stream/-/delayed-stream-1.0.0.tgz#df3ae199acadfb7d440aaae0b29e2272b24ec619"
