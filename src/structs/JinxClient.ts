@@ -1,5 +1,5 @@
 import { Client, ClientOptions } from "discord.js";
-import { Util } from "../utils/Util";
+import { JinxInvite, Util } from "..";
 
 /**
  * The Jinx client extending discord.js client.
@@ -9,6 +9,7 @@ import { Util } from "../utils/Util";
 export class JinxClient extends Client {
     public developerId: string | string[] | undefined;
     public util: Util;
+    public invite!: JinxInvite | null;
 
     constructor (options: JinxOptions) {
         super(options);
@@ -20,10 +21,24 @@ export class JinxClient extends Client {
         this.developerId = options["developerId"];
 
         /**
-         * The class with utility methods.
+         * The utility of the client
          * @type {Util}
          */
         this.util = new Util(this);
+        
+        /**
+         * The invite creator of the client
+         * @type {JinxInvite | null}
+         */
+        this.invite = null;
+    };
+
+    public login(token?: string): Promise<string> {
+        this.once("ready", () => {
+            this.invite = new JinxInvite(this);
+        });
+
+        return super.login(token);
     };
 };
 
