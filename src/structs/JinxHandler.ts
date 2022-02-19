@@ -49,7 +49,6 @@ export class JinxHandler {
     
     public loadAll (directory: string = this.directory) {
         const paths = this.client.util.readdirFiles(directory);
-        console.log(paths)
 
         for (let i = 0; i < paths.length; i++) {
             const file = path.resolve(paths[i]);
