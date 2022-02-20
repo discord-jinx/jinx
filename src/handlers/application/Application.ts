@@ -9,7 +9,7 @@ import {
     UserContextMenuInteraction
 } from "discord.js";
 import { ApplicationHandler } from "..";
-import { JinxClient, JinxError } from "../..";
+import { JinxClient, JinxError, JinxModule } from "../..";
 
 const appTypes = {
     "CHAT_INPUT": "chat",
@@ -21,7 +21,7 @@ const appTypes = {
  * Represents a application command
  * @param {ApplicationCommandDataResolvable & ApplicationOptions} data - The options for the command
  */
-export class Application {
+export class Application extends JinxModule {
     public type?: string;
     public name?: string;
     public description?: string;
@@ -34,9 +34,10 @@ export class Application {
     public dmOnly?: boolean;
     public onlyChannel?: string | string[];
     public onlyUser?: string | string[];
-    public id: string;
+    public id!: string;
 
     constructor(data = {} as ApplicationCommandDataResolvable & ApplicationOptions) {
+        super();
 
         const {
             type = "CHAT_INPUT",
@@ -99,7 +100,7 @@ export class Application {
          * The id of the command
          * @type {string | null}
          */
-         this.id = appTypes[type] + "-" + this.name;
+         Object.defineProperty(this, "id", { value: appTypes[type] + "-" + this.name, enumerable: false });
 
         /**
          * Defines the property - "allowDM"
@@ -145,20 +146,6 @@ export class Application {
      */
     public interact(interaction: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction) {
         return;
-    };
-
-    /**
-     * Removes the command from the cache
-     */
-    public remove() {
-        return this.handler.remove(this.id as string);
-    };
-
-    /**
-     * Reloads the command
-     */
-    public reload () {
-        return this.handler.reload(this.id as string);
     };
 };
 
