@@ -1,6 +1,6 @@
 import { ClientEvents } from "discord.js";
 import { EventHandler } from "..";
-import { JinxClient } from "../..";
+import { JinxClient, JinxError } from "../..";
 
 /**
  * Represents a event
@@ -14,7 +14,9 @@ export class Event {
     public readonly id: string;
 
     constructor (options: EventOptions) {
-        const { name, once } = options;
+        const { name = null, once } = typeof options === "object" ? options : {} as EventOptions;
+        
+        if (!name) throw new JinxError("NO_MODULE_NAME");
         
         /**
          * The name of the event
