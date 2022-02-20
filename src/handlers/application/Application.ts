@@ -9,7 +9,7 @@ import {
     UserContextMenuInteraction
 } from "discord.js";
 import { ApplicationHandler } from "..";
-import { JinxClient } from "../..";
+import { JinxClient, JinxError } from "../..";
 
 const appTypes = {
     "CHAT_INPUT": "chat",
@@ -34,7 +34,7 @@ export class Application {
     public dmOnly?: boolean;
     public onlyChannel?: string | string[];
     public onlyUser?: string | string[];
-    public id?: string;
+    public id: string;
 
     constructor(data = {} as ApplicationCommandDataResolvable & ApplicationOptions) {
 
@@ -45,7 +45,9 @@ export class Application {
             dmOnly = false,
             onlyChannel = null,
             onlyUser = null
-        } = data;
+        } = typeof data === "object" ? data : {} as ApplicationCommandDataResolvable & ApplicationOptions;
+
+        if (!name) throw new JinxError("NO_MODULE_NAME");
 
         /**
          * The type of the command
@@ -59,12 +61,6 @@ export class Application {
          * @type {string | null}
          */
         this.name = name as string;
-
-        /**
-         * The id of the command
-         * @type {string | null}
-         */
-        this.id = "";
 
 
         if (type === "CHAT_INPUT") {
@@ -88,8 +84,6 @@ export class Application {
              */
             this.defaultPermission = Boolean(defaultPermission);
             this.default_permission = Boolean(defaultPermission);
-
-            this.id = appTypes[type] + "-" + this.name;
         } else if (type === "MESSAGE" || type === "USER") {
             const { defaultPermission = true } = data as UserApplicationCommandData | MessageApplicationCommandData;
 
@@ -99,9 +93,13 @@ export class Application {
              */
             this.defaultPermission = Boolean(defaultPermission);
             this.default_permission = Boolean(defaultPermission);
-
-            this.id = appTypes[type] + "-" + this.name;
         };
+
+        /**
+         * The id of the command
+         * @type {string | null}
+         */
+         this.id = appTypes[type] + "-" + this.name;
 
         /**
          * Defines the property - "allowDM"
@@ -127,7 +125,7 @@ export class Application {
          */
         Object.defineProperty(this, "onlyUser", { value: onlyUser, enumerable: false });
 
-        this.handler.cache.set(`${appTypes[type]}-${this.name}`, this);
+        this.handler.cache.set(this.id, this);
     };
 
     /**
