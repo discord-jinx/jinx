@@ -1,4 +1,5 @@
 import { ClientEvents } from "discord.js";
+import { EventHandler } from "..";
 import { JinxModule } from "../..";
 
 /**
@@ -8,6 +9,7 @@ import { JinxModule } from "../..";
 export class Event extends JinxModule {
     public name: string | null;
     public once?: boolean;
+    public handler!: EventHandler;
 
     constructor (options: EventOptions) {
         super("event", options);
