@@ -1,7 +1,7 @@
 import { Collection, UserResolvable } from "discord.js";
 import glob, { sync } from "glob";
 import path from "path";
-import { JinxClient } from "..";
+import { JinxClient, JinxError } from "..";
 
 export class Util {
     public client: JinxClient;
@@ -60,7 +60,7 @@ export class Util {
         file = new file();
 
         if (!(file instanceof handler.instance)) {
-            return null;
+            throw new JinxError("NOT_AN_INSTANCE", handler.instance.name);
         };
 
         return file;
