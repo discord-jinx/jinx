@@ -1,22 +1,18 @@
 import { ClientEvents } from "discord.js";
-import { EventHandler } from "..";
-import { JinxClient, JinxError } from "../..";
+import { JinxModule } from "../..";
 
 /**
  * Represents a event
  * @param {EventOptions} options - The options for the event
  */
-export class Event {
-    public client!: JinxClient;
-    public name: string;
+export class Event extends JinxModule {
+    public name: string | null;
     public once?: boolean;
-    public handler!: EventHandler;
-    public readonly id: string;
 
     constructor (options: EventOptions) {
-        const { name = null, once } = typeof options === "object" ? options : {} as EventOptions;
-        
-        if (!name) throw new JinxError("NO_MODULE_NAME");
+        super("event", options);
+
+        const { name = null, once = false } = typeof options === "object" ? options : {} as EventOptions;
         
         /**
          * The name of the event
@@ -29,14 +25,6 @@ export class Event {
          * @type {boolean}
          */
         this.once = Boolean(once);
-
-        /**
-         * The id of the event
-         * @type {string}
-         */
-        this.id = "event-" + this.name;
-
-        this.handler.cache.set(this.id, this);
     };
     
     public run (...args) {
