@@ -1,5 +1,5 @@
 import { Collection } from "discord.js";
-import { JinxClient, ApplicationHandler } from "..";
+import { JinxClient, ApplicationHandler, JinxError } from "..";
 import path from "path";
 
 /**
@@ -12,7 +12,7 @@ export class JinxHandler {
     public client: JinxClient;
     public directory: string;
     public cache: Collection<string, any>;
-    public instance: Function | undefined;
+    public instance: Function | any;
 
     constructor (client: JinxClient, data: JinxHandlerOptions) {
 
@@ -30,7 +30,7 @@ export class JinxHandler {
 
         /**
          * The module base class
-         * @type {Function}
+         * @type {Function | any}
          */
         this.instance = data.instance;
 
@@ -42,7 +42,9 @@ export class JinxHandler {
 
     };
 
-    public load (filepath: string) {
+    public load (filepath: string | null | undefined) {
+        if (!filepath) throw new JinxError("NO_FILE_PATH");
+
         return this.client.util.getModule(filepath, this);
     };
 
@@ -61,7 +63,9 @@ export class JinxHandler {
      * Reload a module from the cache
      * @param {string} id
      */
-    public reload (id: string): boolean {
+    public reload (id: string | null | undefined): boolean {
+        if (!id) throw new JinxError("NO_ID", "reload");
+
         const file = this.cache.get(id);
 
         if (!file) {
@@ -90,7 +94,9 @@ export class JinxHandler {
      * @param {string} id - The id of the module 
      * @returns {boolean} boolean
      */
-    public remove (id: string): boolean {
+    public remove (id: string | null | undefined): boolean {
+        if (!id) throw new JinxError("NO_ID", "remove");
+        
         return this.cache.delete(id);
     };
 
