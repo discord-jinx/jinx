@@ -4,22 +4,22 @@ export class JinxModule {
     public client!: JinxClient;
     public handler!: JinxHandler;
     public path!: string;
-    public readonly id: string;
+    public id!: string;
 
-    constructor (type: string, options: JinxModuleOptions) {
+    constructor(type?: string, options?: JinxModuleOptions) {
 
         const { name = null } = typeof options === "object" ? options : {} as JinxModuleOptions;
-        
-        if (!name) throw new JinxError("NO_MODULE_NAME");
 
-        /**
-         * The id of the module
-         * @type {string}
-         */
-        this.id = `${type}-${name}`;
+        if (type && name) {
+            /**
+             * The id of the module
+             * @type {string}
+             */
+            this.id = `${type}-${name}`;
+        };
 
-        
-        if ("handler" in this) {
+
+        if ("handler" in this && this.id) {
             this.handler.cache.set(this.id, this);
         };
     };
@@ -29,7 +29,7 @@ export class JinxModule {
      * @param {string} id - The id of the module
      * @returns {boolean} boolean
      */
-    public reload (id = this.id) {
+    public reload (id: string = this.id) {
         return this.handler.reload(id);
     };
 
@@ -38,7 +38,7 @@ export class JinxModule {
      * @param {string} id - The id of the module
      * @returns {boolean} boolean
      */
-    public remove (id = this.id) {
+    public remove (id: string = this.id) {
         return this.handler.remove(id);
     };
 };
