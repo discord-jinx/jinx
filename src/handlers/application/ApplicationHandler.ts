@@ -4,7 +4,7 @@ import {
     UserContextMenuInteraction 
 } from "discord.js";
 import { Application } from "..";
-import { JinxClient, JinxHandler, JinxHandlerOptions } from "../..";
+import { JinxClient, JinxError, JinxHandler, JinxHandlerOptions } from "../..";
 
 /**
  * Handles and loads the commands
@@ -21,7 +21,7 @@ export class ApplicationHandler extends JinxHandler {
     public run: boolean | Function;
 
     constructor (client: JinxClient, {
-        directory,
+        directory = null,
         instance = Application,
         allowDM = false,
         global = true,
@@ -29,6 +29,7 @@ export class ApplicationHandler extends JinxHandler {
         blacklist = [],
         run = true
     } = {} as ApplicationHandlerOptions) {
+        if (!directory) throw new JinxError("NO_DIRECTORY", "application commands");
         super(client, {
             directory,
             instance

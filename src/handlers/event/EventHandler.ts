@@ -1,4 +1,4 @@
-import { JinxClient, JinxHandler, JinxHandlerOptions } from "../..";
+import { JinxClient, JinxError, JinxHandler, JinxHandlerOptions } from "../..";
 import { Event } from "..";
 
 /**
@@ -9,9 +9,10 @@ import { Event } from "..";
  */
 export class EventHandler extends JinxHandler {
     constructor(client: JinxClient, {
-        directory,
+        directory = null,
         instance = Event
     } = {} as JinxHandlerOptions) {
+        if (!directory) throw new JinxError("NO_DIRECTORY", "events");
         super(client, { directory, instance });
     };
 
