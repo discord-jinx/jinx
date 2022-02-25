@@ -1,7 +1,7 @@
-import { Collection, UserResolvable } from "discord.js";
+import { Collection, GuildMember, Message } from "discord.js";
+import { JinxClient, JinxError } from "..";
 import glob, { sync } from "glob";
 import path from "path";
-import { JinxClient, JinxError } from "..";
 
 export class Util {
     public client: JinxClient;
@@ -10,11 +10,20 @@ export class Util {
         this.client = client;
     };
 
+    /**
+     * @param {any} file 
+     * @returns {boolean}
+     */
     public checkClass (file): boolean {
         return (typeof (file) === "function") 
         && file.toString().includes("class");
     };
 
+    /**
+     * Check if the user is a developer
+     * @param {string} id - The id of the user
+     * @returns {boolean}
+     */
     public checkDeveloper (id: string): boolean {
         const { developerId } = this.client;
 
@@ -33,6 +42,10 @@ export class Util {
         return Array.isArray(channel) ? channel.includes(current) : current === channel;
     };
 
+    /**
+     * Gets all the files path from a directory
+     * @param {string} directory - The path to the directory
+     */
     public readdirFiles (directory: string): string[] {
         const cache: string[] = [];
         const files = glob.sync(directory, { nodir: true });
@@ -44,6 +57,12 @@ export class Util {
         return cache;
     };
 
+    /**
+     * Gets the module from the path
+     * @param {string} filepath - The path to the module
+     * @param {*} handler - The handler of the module
+     * @returns {any}
+     */
     public getModule (filepath: string, handler): any | null {
         var file = require(path.resolve(filepath));
 
@@ -66,10 +85,29 @@ export class Util {
         return file;
     };
 
+    /**
+     * Get all the keys from a collection
+     * @param {Collection<any, any>} col - The Discord.js collection
+     * @returns {string[]}
+     */
     public getAllCollectionKeys (col: Collection<any, any>): string[] {
         const cache: string[] = [];
         col.forEach((v, k) => cache.push(k));
 
         return cache;
+    };
+
+    public async resolvePrefix (prefix: string | string[] | Function, message: Message) {
+        var pref: string | string[] = "jx!";
+
+        if (typeof (prefix) === "function") {
+            pref = await prefix(message);
+        } else if (typeof (prefix) === "string") {
+            pref = prefix;
+        } else if (Array.isArray(prefix)) {
+            pref = prefix;
+        };
+
+        return pref;
     };
 };
