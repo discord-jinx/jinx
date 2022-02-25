@@ -27,5 +27,4 @@ yarn add discord-jinx
   
 ## Links
   - [GitHub](https://github.com/nevenxr/discord-jinx)
-  - [Discord](https://discord.gg/tMmhAUJr5d)
   
