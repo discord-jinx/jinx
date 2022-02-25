@@ -18,6 +18,7 @@ export class ApplicationHandler extends JinxHandler {
     public global: boolean;
     public guilds: string | string[];
     public blacklist: string | string[];
+    public refresh: boolean;
     public run: boolean | Function;
 
     constructor (client: JinxClient, {
@@ -27,6 +28,7 @@ export class ApplicationHandler extends JinxHandler {
         global = true,
         guilds = "all",
         blacklist = [],
+        refresh = true,
         run = true
     } = {} as ApplicationHandlerOptions) {
         if (!directory) throw new JinxError("NO_DIRECTORY", "application commands");
@@ -61,6 +63,13 @@ export class ApplicationHandler extends JinxHandler {
         this.blacklist = Array.isArray(blacklist) ? blacklist : [];
 
         /**
+         * Whether to deregister then register global commands
+         * Good for preventing duplicate commands
+         * @type {boolean}
+         */
+        this.refresh = Boolean(refresh);
+
+        /**
          * The function to run before the command
          * Good for checking and blocking the command
          * @type {boolean | Function}
@@ -93,7 +102,7 @@ export class ApplicationHandler extends JinxHandler {
     };
 
     private setup (): void {
-        this.client.once("ready", () => {
+        this.client.once("ready", async () => {
             this.client.on("interactionCreate", (i) => {
 
                 if (this.blacklist.includes(i.user.id)) {
@@ -120,8 +129,12 @@ export class ApplicationHandler extends JinxHandler {
                  commands.push(app);
              });
 
+             if (this.refresh) {
+                 await this.client.application?.commands.set([]);
+             };
+
              if (this.global) {
-                 this.client.application?.commands.set(commands);
+                 await this.client.application?.commands.set(commands);
              };
 
              if (typeof (this.guilds) === "string" && this.guilds === "all") {
@@ -160,5 +173,6 @@ export interface ApplicationHandlerOptions extends JinxHandlerOptions {
     global?: boolean;
     guilds?: "all" | string[];
     blacklist?: string[];
+    refresh?: boolean;
     run?: boolean | ((interaction: MessageContextMenuInteraction | CommandInteraction | UserContextMenuInteraction) => boolean);
 };
