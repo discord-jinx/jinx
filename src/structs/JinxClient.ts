@@ -1,5 +1,5 @@
 import { Client, ClientOptions } from "discord.js";
-import { JinxFetch, JinxInvite, Util } from "..";
+import { JinxCooldown, JinxFetch, JinxInvite, Util } from "..";
 
 /**
  * The Jinx client extending discord.js client.
@@ -11,6 +11,7 @@ export class JinxClient extends Client {
     public util: Util;
     public invite!: JinxInvite | null;
     public fetch: JinxFetch["request"];
+    public cooldown = new JinxCooldown();
 
     constructor (options: JinxOptions) {
         super(options);
