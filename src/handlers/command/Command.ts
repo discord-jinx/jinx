@@ -11,6 +11,8 @@ export class Command extends JinxModule {
     public name: string;
     public description?: string | null;
     public aliases: string[];
+    public category: string | string[];
+    public example: any;
     public developer: boolean;
     public allowBots: boolean;
     public allowClient: boolean;
@@ -27,6 +29,8 @@ export class Command extends JinxModule {
             name = null, 
             description = null, 
             aliases = [], 
+            example = null,
+            category = "default",
             developer = false,
             cooldown,
             allowBots,
@@ -81,6 +85,18 @@ export class Command extends JinxModule {
         this.developer = Boolean(developer);
 
         /**
+         * The examples for the command
+         * @type {any}
+         */
+        this.example = example;
+
+        /**
+         * The category for the command
+         * @type {string}
+         */
+        this.category = category;
+
+        /**
          * The permissions required for the user
          * @type {string[]}
          */
@@ -118,6 +134,8 @@ export interface CommandOptions {
     name: string;
     description?: string;
     aliases?: string[];
+    category?: string | string[];
+    example?: any;
     developer?: boolean;
     allowBots?: boolean;
     allowClient?: boolean;
