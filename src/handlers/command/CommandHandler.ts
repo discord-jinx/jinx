@@ -71,12 +71,15 @@ export class CommandHandler extends JinxHandler {
          * @type {Function}
          */
         this.cooldownMessage = typeof cooldownMessage === "function" ? cooldownMessage.bind(this) : () => true;
+
+        /**
+         * Setup the commands
+         */
+        this.setup();
     };
 
     public load(filepath: string) {
-        this.client.util.getModule(filepath, this);
-
-        return this.setup();
+        return this.client.util.getModule(filepath, this);
     };
 
     private setup() {
